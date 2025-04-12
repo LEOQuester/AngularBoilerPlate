@@ -1,0 +1,31 @@
+@import "primeicons/primeicons.css";
+@tailwind base;
+@tailwind components; 
+@tailwind utilities;
+
+Body{
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+}
+.iti {
+    position: relative;
+  }
+  
+.iti__country-list {
+    max-height: 200px;  
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 9999 !important;  
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    max-width: 290px;
+}
+#country-search-box{
+    padding: 10px;
+    border-radius: 5px;
+    color: gray
+}
+#phone_input, .iti--allow-dropdown, .custom{
+    width: 100%;
+}
+  

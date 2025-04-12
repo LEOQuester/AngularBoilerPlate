@@ -1,0 +1,107 @@
+<div class="surface-ground flex items-center justify-center min-h-screen min-w-full overflow-hidden px-4">
+    <div class="flex flex-col items-center justify-center w-full max-w-md mx-auto mt-0">
+      <p-card styleClass="shadow-2 rounded-2xl w-full">
+        <div class="text-center mb-5">
+          <div class="text-gray-900 text-3xl font-semibold mb-3 dark:text-slate-300">Welcome Back</div>
+          <span class="text-gray-600 font-medium">Sign in to continue</span>
+        </div>
+  
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="w-full">
+          <div class="mb-4">
+            <p-tabs [(value)]="loginTypeIndex" (valueChange)="selectLoginType(loginTypeIndex)">
+              <p-tablist>
+                <p-tab value="0"><i class="pi pi-envelope"></i> Email</p-tab>
+                <p-tab value="1"><i class="pi pi-phone"></i> Phone</p-tab>
+                <p-tab value="2"><i class="pi pi-user"></i> Username</p-tab>
+              </p-tablist>
+  
+              <p-tabpanels>
+                <div *ngIf="loginTypeIndex == null">Select a login type</div>
+  
+                <!-- Email -->
+                <p-tabpanel value="0">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="email_input" formControlName="email" autocomplete="on" class="w-full" />
+                    <label for="email_input">Email</label>
+                  </p-floatlabel>
+                  <small class="p-error" *ngIf="loginForm.get('email')?.errors?.['email'] && loginForm.get('email')?.touched">
+                    Please enter a valid email address.
+                  </small>
+                </p-tabpanel>
+  
+                <!-- Phone -->
+                <p-tabpanel value="1">
+                  <div class="w-full">
+                    <ngx-intl-tel-input
+                      id="phone_input"
+                      (input)="onPhoneInput($event)"
+                      [cssClass]="'custom border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none'"
+                      [enableAutoCountrySelect]="true"
+                      type="tel"
+                      [enablePlaceholder]="true"
+                      [searchCountryFlag]="true"
+                      [selectFirstCountry]="true"
+                      [preferredCountries]="preferredCountries"
+                      [selectedCountryISO]="selectedCountry"
+                      [maxLength]="15"
+                      [phoneValidation]="true"
+                      [numberFormat]="PhoneNumberFormat.National"
+                      name="phone"
+                      [separateDialCode]="false"
+                      formControlName="phone"
+                    ></ngx-intl-tel-input>
+                  </div>
+                  <small *ngIf="loginForm.get('phone')?.invalid && loginForm.get('phone')?.touched" class="p-error">
+                    Please enter a valid phone number.
+                  </small>
+                </p-tabpanel>
+  
+                <!-- Username -->
+                <p-tabpanel value="2">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="username_input" formControlName="username" autocomplete="on" class="w-full" />
+                    <label for="username_input">Username</label>
+                  </p-floatlabel>
+                  <small class="p-error" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+                    Username is required.
+                  </small>
+                </p-tabpanel>
+              </p-tabpanels>
+            </p-tabs>
+          </div>
+  
+          <div class="px-4 pt-0">
+            <!-- Password -->
+            <div class="mb-4">
+              <p-floatlabel variant="on">
+                <input pInputText id="password_input" formControlName="password" autocomplete="off" type="password" class="w-full" />
+                <label for="password_input">Password</label>
+              </p-floatlabel>
+              <small class="p-error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+                Password must be at least 6 characters long.
+              </small>
+            </div>
+  
+            <!-- Remember & Forgot -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
+              <div class="flex items-center">
+                <p-checkbox [(ngModel)]="rememberMe" [ngModelOptions]="{ standalone: true }" [binary]="true" inputId="rememberme" styleClass="mr-2"></p-checkbox>
+                <label for="rememberme" class="text-gray-900 dark:text-slate-300">Remember me</label>
+              </div>
+              <a class="text-sm font-medium text-blue-500 cursor-pointer">Forgot password?</a>
+            </div>
+  
+            <!-- Buttons -->
+            <p-button type="submit" label="Sign In" [disabled]="loginForm.invalid" styleClass="w-full mb-4" [raised]="true"></p-button>
+  
+            <p-divider align="center">
+              <span class="text-gray-600 font-normal">Don't have an account?</span>
+            </p-divider>
+  
+            <p-button label="Create account" styleClass="w-full p-button-outlined mt-2" [raised]="true"></p-button>
+          </div>
+        </form>
+      </p-card>
+    </div>
+  </div>
+  

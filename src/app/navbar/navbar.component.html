@@ -1,0 +1,91 @@
+<nav class="p-2 shadow-md m-2 mb-0 flex justify-between rounded">
+    <div>
+        <div class="flex items-center m-2">
+            <!-- Logo -->
+            <img [src]="logoPath" alt="Logo" class="h-8">
+            <p class="ml-2 text-gray-600 dark:text-gray-50">Josheph Vas LMS</p>
+        </div>
+    </div>
+
+
+    <!-- Main content wrapper -->
+    <div class="flex justify-between items-center">
+
+      <!-- Menu Items (Visible only on large screens) -->
+      <ul class="hidden lg:flex gap-2 ml-6 mr-5">
+        <li *ngFor="let item of menuItems" 
+            class="flex items-center gap-2 p-2 min-w-fit w-[150px] 
+             text-gray-600 hover:bg-slate-100 
+             dark:text-gray-50 dark:hover:bg-gray-700 
+            text-center m-1 justify-center rounded-md cursor-pointer"          
+            [routerLink]="item.link" 
+          routerLinkActive="active">  <!-- Close the drawer when clicking -->
+        <i [class]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </li>
+      </ul>
+
+      <div class="hidden lg:flex gap-6 ml-6 mr-5">
+      <!-- Additional Buttons if needed for all screens-->
+
+      </div>
+      
+      
+
+        <div class="flex items-center mt-0 lg:mt-1 gap-2">
+            <!-- Profile Icon -->
+            <div class="flex items-center">
+                <p-avatar
+                label="V"
+                styleClass="mr-2"
+                class="lg:size-large p-2 cursor-pointer"
+                [style]="{ 'background-color': '#fafbfc', color: '#2a1261' }"
+                shape="circle"
+                />
+            </div>
+
+            <!-- Dark Mode Toggle Button -->
+            <button
+                (click)="toggleDarkMode()"
+                class="flex items-center justify-center p-[8px] rounded-full bg-gray-50 text-gray-800 hover:bg-gray-200"
+            >
+                <i
+                class="pi"
+                [ngClass]="{ 'pi-sun': !isDarkMode, 'pi-moon': isDarkMode }"
+                ></i>
+            </button>
+
+            <!-- Mobile Hamburger Menu Icon (Visible only on small screens) -->
+            <div class="lg:hidden ml-2">
+                <button (click)="toggleDrawer()" class="flex p-2 items-center justify-center rounded-full bg-gray-50 text-gray-800 hover:bg-gray-200">
+                  <i class="pi pi-bars"></i>
+                </button>
+            </div>
+        </div>
+      
+    </div>
+
+    
+  
+   
+    
+    
+  </nav>
+  <!-- PrimeNG Drawer (Mobile) -->
+  <p-drawer [(visible)]="isDrawerOpen" position="right" [modal]="true" [closable]="true" (onHide)="onDrawerHide()">
+    <ul>
+      <li *ngFor="let item of menuItems" 
+            class="flex items-center gap-4 p-2 w-full
+            bg-slate-50 dark:bg-gray-800
+            text-gray-600 hover:bg-slate-100 
+            dark:text-gray-50 dark:hover:bg-gray-700 
+            text-center m-1 justify-center rounded-md cursor-pointer" 
+          [routerLink]="item.link" 
+          routerLinkActive="active">  <!-- Close the drawer when clicking -->
+        
+        <i [class]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </li>
+    </ul>
+</p-drawer>
+  
