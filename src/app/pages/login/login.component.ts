@@ -13,28 +13,26 @@ import { TabsModule } from 'primeng/tabs';
 import { DropdownModule } from 'primeng/dropdown';
 import { parsePhoneNumberFromString, isValidPhoneNumber } from 'libphonenumber-js';
 import {NgxIntlTelInputModule, SearchCountryField, CountryISO, PhoneNumberFormat} from 'ngx-intl-tel-input';
+import { AuthService } from '../../services/auth/auth.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { Ripple } from 'primeng/ripple';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule,
-    DropdownModule,
-    MessageModule,
-    InputTextModule,
-    ButtonModule,
-    NgxIntlTelInputModule,
-    CardModule,
-    FloatLabel,
-    PasswordModule,
-    DividerModule,
-    CheckboxModule,
-    TabsModule,
-    FormsModule,
-    ReactiveFormsModule
+    CommonModule,DropdownModule,
+    MessageModule,InputTextModule,
+    ButtonModule,NgxIntlTelInputModule,
+    CardModule,FloatLabel,PasswordModule,
+    DividerModule,CheckboxModule,TabsModule,Ripple,
+    FormsModule,ReactiveFormsModule, ToastModule, 
   ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'] // ✅ corrected from styleUrl to styleUrls
+  styleUrls: ['./login.component.css'],
+  providers: [MessageService]
 })
 export class LoginComponent implements OnInit, AfterViewInit {
   
@@ -46,6 +44,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   phone_initialized: boolean = false; 
   SearchCountryField = SearchCountryField;
 	CountryISO = CountryISO;
+  isLoggingIn : boolean = false;
   
   PhoneNumberFormat = PhoneNumberFormat;
   preferredCountries: CountryISO[] = [CountryISO.SriLanka];
@@ -57,14 +56,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   countryCodes = [];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private authService: AuthService, private messageService: MessageService) {}
 
   ngOnInit(): void {
     this.initForm();
-  }
-
-  ngAfterViewInit(): void {
-    this.selectLoginType(this.loginTypeIndex);
   }
 
   initForm(): void {
@@ -76,10 +71,13 @@ export class LoginComponent implements OnInit, AfterViewInit {
     });
   }
 
+  ngAfterViewInit(): void {
+    this.selectLoginType(this.loginTypeIndex);
+  }
+
   selectLoginType(index: number): void {
     console.log('Selected login type index:', index);
     this.loginTypeIndex = index;
-
   
     const email = this.loginForm.get('email');
     const phone = this.loginForm.get('phone');
@@ -119,37 +117,32 @@ export class LoginComponent implements OnInit, AfterViewInit {
     username?.updateValueAndValidity();
   }
 
-  getValidatorsForType(type: string) {
-    switch (type) {
-      case 'email':
-        return Validators.email;
-      case 'phone':
-        return Validators.required;
-      case 'username':
-        return Validators.required;
-      default:
-        return Validators.required;
-    }
-  }
-
   onSubmit(): void {
+    this.isLoggingIn = true
     const control = this.loginForm.get(this.loginType);
     const password = this.loginForm.get('password');
   
     if (!control?.valid || !password?.valid) return;
   
     const payload = {
-      type: this.loginType,
-      value: control.value,
+      username_or_email_or_phone: control.value,
       password: password.value
     };
   
-    console.log('Login payload:', payload);
-  }
+    this.authService.login(payload).pipe(
+      finalize(() => this.isLoggingIn = false)
+    ).subscribe({
+      next: (response) => {
+        console.log('Login successful:', response);
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Login Successfull. You will be redirected in a few seconds' });
+      },
+      error: (error) => {
+        console.error('Login failed:', error);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login Failed. Please try again!' });
+        console.log("is this line triggered?");
 
-  toggleDarkMode(): void {
-    const element = document.querySelector('html');
-    element?.classList.toggle('my-app-dark');
+      },
+    });
   }
 
   onPhoneInput(_: Event) {

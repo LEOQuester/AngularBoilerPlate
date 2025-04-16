@@ -82,17 +82,13 @@
               </small>
             </div>
   
-            <!-- Remember & Forgot -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
-              <div class="flex items-center">
-                <p-checkbox [(ngModel)]="rememberMe" [ngModelOptions]="{ standalone: true }" [binary]="true" inputId="rememberme" styleClass="mr-2"></p-checkbox>
-                <label for="rememberme" class="text-gray-900 dark:text-slate-300">Remember me</label>
-              </div>
+            <!--Forgot -->
+            <div class="flex justify-end sm:flex-row items-end mb-4 gap-2">
               <a class="text-sm font-medium text-blue-500 cursor-pointer">Forgot password?</a>
             </div>
   
             <!-- Buttons -->
-            <p-button type="submit" label="Sign In" [disabled]="loginForm.invalid" styleClass="w-full mb-4" [raised]="true"></p-button>
+            <p-button type="submit" label="Sign In" [disabled]="loginForm.invalid || isLoggingIn" [loading]="isLoggingIn" styleClass="w-full mb-4" [raised]="true"></p-button>
   
             <p-divider align="center">
               <span class="text-gray-600 font-normal">Don't have an account?</span>
@@ -104,4 +100,6 @@
       </p-card>
     </div>
   </div>
+  <p-toast [breakpoints]="{ '500px': { width: '90%', right: '1%', left: '10%' } }"></p-toast>
+
   
