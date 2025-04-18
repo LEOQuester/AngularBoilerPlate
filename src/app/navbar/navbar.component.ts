@@ -2,9 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AvatarModule } from 'primeng/avatar';
 import { AvatarGroupModule } from 'primeng/avatargroup';
+import { TooltipModule } from 'primeng/tooltip';
+import { AuthService } from '../services/auth/auth.service';
+import { User } from '../models/auth/auth.interface';
 
 @Component({
   selector: 'app-navbar',
@@ -15,7 +18,8 @@ import { AvatarGroupModule } from 'primeng/avatargroup';
     DrawerModule,
     RouterModule,
     AvatarModule,
-    AvatarGroupModule
+    AvatarGroupModule,
+    TooltipModule
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
@@ -37,23 +41,58 @@ export class NavbarComponent implements OnInit {
 
   isDarkMode: boolean = false;
   isDrawerOpen: boolean = false;
+  currentUser: User | null = null;
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   // Initialize theme state on component load
   ngOnInit(): void {
     const savedMode = localStorage.getItem('darkMode');
-    console.log('Saved dark mode state:', savedMode); // Debugging line to check the saved state
     if (savedMode) {
-      this.isDarkMode = savedMode === 'true'; // Convert the string value from localStorage to a boolean
-      this.applyTheme();  // Apply the theme based on the stored state
+      this.isDarkMode = savedMode === 'true';
+      this.applyTheme();
     }
+    this.loadUser();
+  }
+
+  private loadUser(): void {
+    const userString = localStorage.getItem(this.authService.getUserStorageKey());
+    if (userString) {
+      this.currentUser = JSON.parse(userString);
+    }
+  }
+
+  get userInitial(): string {
+    if (!this.currentUser) return '';
+    return this.currentUser.name.charAt(0).toUpperCase();
+  }
+
+  get userProfile(): string | undefined {
+    if (!this.currentUser) return undefined;
+    return (this.currentUser as any)?.profile?.image || undefined;
+  }
+
+  // Check if user is not logged in
+  get isUserNotLoggedIn(): boolean {
+    return !localStorage.getItem(this.authService.getUserStorageKey());
+  }
+
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   // Toggle dark mode
   toggleDarkMode(): void {
     this.isDarkMode = !this.isDarkMode;
     this.applyTheme();
-    localStorage.setItem('darkMode', this.isDarkMode.toString()); // Save the state to localStorage
-    console.log(localStorage.getItem('darkMode')) 
+    localStorage.setItem('darkMode', this.isDarkMode.toString());
   }
 
   // Apply the theme based on the state
@@ -69,7 +108,15 @@ export class NavbarComponent implements OnInit {
   onDrawerHide(): void {
     this.isDrawerOpen = false;
   }
+  
   toggleDrawer(): void {
     this.isDrawerOpen = !this.isDrawerOpen;
+  }
+
+  navigateToProfile(): void {
+    this.router.navigate(['/update-profile']);
+    if (this.isDrawerOpen) {
+      this.isDrawerOpen = false;
+    }
   }
 }

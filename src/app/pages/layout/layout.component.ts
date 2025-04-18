@@ -2,13 +2,15 @@ import { Component } from '@angular/core';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
+import { DashboardComponent } from '../dashboard/dashboard.component';
 
 @Component({
   selector: 'app-layout',
   imports: [
     DrawerModule,
     ButtonModule,
-    AvatarModule
+    AvatarModule,
+    DashboardComponent
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css'

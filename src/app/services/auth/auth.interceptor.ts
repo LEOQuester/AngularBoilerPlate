@@ -6,7 +6,7 @@ import {
   HttpInterceptorFn,
   HttpErrorResponse
 } from '@angular/common/http';
-import { Observable, catchError, switchMap, throwError } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (
@@ -15,34 +15,26 @@ export const authInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
   
-  // Add token if available
-  if (authService.token) {
-    req = req.clone({
+  // Clone the request and always include credentials
+  let modifiedReq = req.clone({
+    withCredentials: true
+  });
+  
+  // Add authorization header if token exists (except for verify and refresh endpoints)
+  if (authService.token && !req.url.includes('token/verify') && !req.url.includes('token/refresh')) {
+    modifiedReq = modifiedReq.clone({
       setHeaders: {
         Authorization: `Bearer ${authService.token}`
       }
     });
   }
 
-  return next(req).pipe(
+  return next(modifiedReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && !req.url.includes('token/refresh')) {
-        // Try to refresh token
-        return authService.refreshToken().pipe(
-          switchMap(() => {
-            // Retry the original request with new token from AuthService
-            const updatedReq = req.clone({
-              setHeaders: {
-                Authorization: `Bearer ${authService.token}`
-              }
-            });
-            return next(updatedReq);
-          }),
-          catchError((refreshError) => {
-            console.error('Token refresh failed:', refreshError);
-            return throwError(() => refreshError);
-          })
-        );
+      // Just handle unauthorized errors by clearing user data
+      // Token verification and refresh is handled by the auth guard
+      if (error.status === 401) {
+        console.log('Unauthorized request:', req.url);
       }
       return throwError(() => error);
     })

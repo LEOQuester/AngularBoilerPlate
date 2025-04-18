@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { MessageModule } from 'primeng/message';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -18,6 +19,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Ripple } from 'primeng/ripple';
 import { finalize } from 'rxjs/operators';
+import { DialogModule } from 'primeng/dialog'
 
 @Component({
   selector: 'app-login',
@@ -28,7 +30,7 @@ import { finalize } from 'rxjs/operators';
     ButtonModule,NgxIntlTelInputModule,
     CardModule,FloatLabel,PasswordModule,
     DividerModule,CheckboxModule,TabsModule,Ripple,
-    FormsModule,ReactiveFormsModule, ToastModule, 
+    FormsModule,ReactiveFormsModule, ToastModule, DialogModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
@@ -45,6 +47,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   SearchCountryField = SearchCountryField;
 	CountryISO = CountryISO;
   isLoggingIn : boolean = false;
+  controlValue : any = "";
   
   PhoneNumberFormat = PhoneNumberFormat;
   preferredCountries: CountryISO[] = [CountryISO.SriLanka];
@@ -56,10 +59,20 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   countryCodes = [];
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private messageService: MessageService) {}
+  isForgotPasswordModalVisible: boolean = false;
+  forgotPasswordForm!: FormGroup;
+  isSubmittingForgotPassword: boolean = false;
+
+  constructor(
+    private fb: FormBuilder, 
+    private authService: AuthService, 
+    private messageService: MessageService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.initForm();
+    this.initForgotPasswordForm();
   }
 
   initForm(): void {
@@ -68,6 +81,12 @@ export class LoginComponent implements OnInit, AfterViewInit {
       phone: [{ value: '', disabled: true }, [Validators.required]],
       username: [{ value: '', disabled: true }, [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
+
+  initForgotPasswordForm(): void {
+    this.forgotPasswordForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
     });
   }
 
@@ -118,14 +137,20 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   onSubmit(): void {
-    this.isLoggingIn = true
+    this.isLoggingIn = true;
     const control = this.loginForm.get(this.loginType);
     const password = this.loginForm.get('password');
   
     if (!control?.valid || !password?.valid) return;
-  
+    
+    this.controlValue = control.value;
+
+    if (this.loginType == "phone"){
+      this.controlValue = control.value.e164Number; 
+    }
+
     const payload = {
-      username_or_email_or_phone: control.value,
+      username_or_email_or_phone: this.controlValue,
       password: password.value
     };
   
@@ -133,14 +158,23 @@ export class LoginComponent implements OnInit, AfterViewInit {
       finalize(() => this.isLoggingIn = false)
     ).subscribe({
       next: (response) => {
-        console.log('Login successful:', response);
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Login Successfull. You will be redirected in a few seconds' });
+        console.log('Login successful, checking cookies:', document.cookie);
+        this.messageService.add({ 
+          severity: 'success', 
+          summary: 'Success', 
+          detail: 'Login successful' 
+        });
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 5000); // 5000 milliseconds = 5 seconds
       },
       error: (error) => {
         console.error('Login failed:', error);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Login Failed. Please try again!' });
-        console.log("is this line triggered?");
-
+        this.messageService.add({ 
+          severity: 'error', 
+          summary: 'Error', 
+          detail: error.error?.message || 'Login Failed. Please try again!'
+        });
       },
     });
   }
@@ -175,5 +209,27 @@ export class LoginComponent implements OnInit, AfterViewInit {
     }, 200);
   }
 
+  openForgotPasswordModal(): void {
+    this.isForgotPasswordModalVisible = true;
+  }
+
+  onForgotPasswordSubmit(): void {
+    if (this.forgotPasswordForm.invalid) return;
+
+    this.isSubmittingForgotPassword = true;
+    const email = this.forgotPasswordForm.get('email')?.value;
+
+    this.authService.forgotPassword({ email }).pipe(
+      finalize(() => (this.isSubmittingForgotPassword = false))
+    ).subscribe({
+      next: (response: { message: string }) => {
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: "Reset link sent. Please check your email!" });
+        this.isForgotPasswordModalVisible = false;
+      },
+      error: (error: any) => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: error.error.message });
+      }
+    });
+  }
 
 }

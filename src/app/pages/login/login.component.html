@@ -84,7 +84,7 @@
   
             <!--Forgot -->
             <div class="flex justify-end sm:flex-row items-end mb-4 gap-2">
-              <a class="text-sm font-medium text-blue-500 cursor-pointer">Forgot password?</a>
+              <a class="text-sm font-medium text-blue-500 cursor-pointer" (click)="openForgotPasswordModal()">Forgot password?</a>
             </div>
   
             <!-- Buttons -->
@@ -102,4 +102,20 @@
   </div>
   <p-toast [breakpoints]="{ '500px': { width: '90%', right: '1%', left: '10%' } }"></p-toast>
 
-  
+  <!-- Forgot Password Modal -->
+  <p-dialog header="Forgot Password" [(visible)]="isForgotPasswordModalVisible" [modal]="true" [closable]="true" [dismissableMask]="true" class="m-1">
+    <form [formGroup]="forgotPasswordForm" (ngSubmit)="onForgotPasswordSubmit()">
+      <div class="form-group">
+        <label for="forgotEmail">Email Address</label>
+        <input pInputText id="forgotEmail" type="email" formControlName="email" placeholder="Enter your email" class="w-full" />
+        <small *ngIf="forgotPasswordForm.get('email')?.invalid && forgotPasswordForm.get('email')?.touched" class="p-error">
+          Please enter a valid email address.
+        </small>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button type="button" pButton label="Cancel" class="p-button-text" (click)="isForgotPasswordModalVisible = false"></button>
+        <button type="submit" pButton label="Submit" [disabled]="forgotPasswordForm.invalid || isSubmittingForgotPassword" [loading]="isSubmittingForgotPassword"></button>
+      </div>
+    </form>
+  </p-dialog>
+
