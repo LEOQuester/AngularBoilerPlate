@@ -1,0 +1,10 @@
+.breadcrumb-container {
+    padding: 0.5rem 1rem;
+    background-color: var(--surface-card);
+}
+
+:host ::ng-deep .p-breadcrumb {
+    background: transparent;
+    border: none;
+    padding: 0;
+}

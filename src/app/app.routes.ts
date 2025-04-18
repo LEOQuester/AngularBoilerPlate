@@ -20,11 +20,13 @@ export const routes: Routes = [
     },
     {
         path: "test",
-        component: TestComponent
+        component: TestComponent,
+        data: { breadcrumb: 'Test' }
     },
     {
         path: "reset-password",
-        component: ResetPasswordComponent
+        component: ResetPasswordComponent,
+        data: { breadcrumb: 'Reset Password' }
     },
     {
         path: "",
@@ -33,11 +35,13 @@ export const routes: Routes = [
         children: [
             {
                 path: "dashboard",
-                component: DashboardComponent
+                component: DashboardComponent,
+                data: { breadcrumb: 'Dashboard' }
             },
             {
                 path: "update-profile",
-                loadChildren: () => import('./pages/update-profile/update-profile.routes').then(m => m.UPDATE_PROFILE_ROUTES)
+                loadComponent: () => import('./pages/update-profile/update-profile.component').then(m => m.UpdateProfileComponent),
+                data: { breadcrumb: 'Update Profile' }
             }
         ]
     }

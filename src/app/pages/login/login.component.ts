@@ -20,6 +20,7 @@ import { MessageService } from 'primeng/api';
 import { Ripple } from 'primeng/ripple';
 import { finalize } from 'rxjs/operators';
 import { DialogModule } from 'primeng/dialog'
+import { FooterComponent } from '../../components/footer/footer.component';
 
 @Component({
   selector: 'app-login',
@@ -30,7 +31,8 @@ import { DialogModule } from 'primeng/dialog'
     ButtonModule,NgxIntlTelInputModule,
     CardModule,FloatLabel,PasswordModule,
     DividerModule,CheckboxModule,TabsModule,Ripple,
-    FormsModule,ReactiveFormsModule, ToastModule, DialogModule
+    FormsModule,ReactiveFormsModule, ToastModule, DialogModule,
+    FooterComponent
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],

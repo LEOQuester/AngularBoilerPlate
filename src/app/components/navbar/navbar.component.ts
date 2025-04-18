@@ -6,8 +6,8 @@ import { RouterModule, Router } from '@angular/router';
 import { AvatarModule } from 'primeng/avatar';
 import { AvatarGroupModule } from 'primeng/avatargroup';
 import { TooltipModule } from 'primeng/tooltip';
-import { AuthService } from '../services/auth/auth.service';
-import { User } from '../models/auth/auth.interface';
+import { AuthService } from '../../services/auth/auth.service';
+import { User } from '../../models/auth/auth.interface';
 
 @Component({
   selector: 'app-navbar',
@@ -31,9 +31,9 @@ export class NavbarComponent implements OnInit {
   
 
   //customise this section to add more menu items
-  // Add more menu items as needed
+  // maximum 4 items are allowed in the navbar
   menuItems = [
-    { label: 'Home', link: '/home', icon: 'pi pi-home' },
+    { label: 'Home', link: '/dashboard', icon: 'pi pi-home' },
     { label: 'About', link: '/about', icon: 'pi pi-info-circle' },
     { label: 'Docs', link: '/docs', icon: 'pi pi-question-circle' },
     { label: 'Contact', link: '/contact', icon: 'pi pi-phone' }
