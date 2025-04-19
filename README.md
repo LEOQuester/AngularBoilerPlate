@@ -331,4 +331,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For support, please open an issue in the repository.
 
 ---
-Note: Replace the screenshot placeholders in the docs/images/ directory with actual screenshots of your application.
+
