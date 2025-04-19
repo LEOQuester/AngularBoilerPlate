@@ -55,27 +55,27 @@ A production-ready Angular 17+ boilerplate for Enterprise Resource Planning (ERP
 ### Installation
 
 1. Clone the repository:
-\`\`\`bash
+```bash
 git clone <your-repository-url>
 cd AngularBoilerPlate
-\`\`\`
+```
 
 2. Install dependencies:
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 3. Configure environment variables:
-   - Navigate to \`src/environments\`
-   - Copy \`environment.ts.example\` to \`environment.ts\`
+   - Navigate to `src/environments`
+   - Copy `environment.ts.example` to `environment.ts`
    - Update API endpoints and other configurations
 
 4. Start the development server:
-\`\`\`bash
+```bash
 npm start
-\`\`\`
+```
 
-The application will be available at \`http://localhost:4200\`
+The application will be available at `http://localhost:4200`
 
 ## Authentication System
 
@@ -85,18 +85,18 @@ The system uses a dual-token approach for security:
 1. Access Token (JWT) for API authentication
 2. HTTP-Only Cookie Refresh Token for security
 
-![Auth Flow Diagram](docs/images/auth-flow.png)
+![Auth Flow Diagram](docs/images/auth_flow.jpeg)
 
 ### Key Authentication Files
 
-- \`src/app/services/auth/auth.service.ts\` - Main authentication service
-- \`src/app/services/auth/auth.guard.ts\` - Route protection
-- \`src/app/services/auth/auth.interceptor.ts\` - HTTP interceptor for token handling
+- `src/app/services/auth/auth.service.ts` - Main authentication service
+- `src/app/services/auth/auth.guard.ts` - Route protection
+- `src/app/services/auth/auth.interceptor.ts` - HTTP interceptor for token handling
 
 ### Authentication Configuration
 
-1. Configure API endpoints in \`environment.ts\`:
-\`\`\`typescript
+1. Configure API endpoints in `environment.ts`:
+```typescript
 export const environment = {
   production: false,
   apiUrl: 'your-api-url',
@@ -106,20 +106,20 @@ export const environment = {
     logoutEndpoint: '/api/auth/logout'
   }
 };
-\`\`\`
+```
 
-2. Customize authentication behavior in \`auth.service.ts\`:
-\`\`\`typescript
+2. Customize authentication behavior in `auth.service.ts`:
+```typescript
 // Token refresh timing
 private readonly TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes
 
 // Storage keys
 private readonly USER_KEY = 'user';
-\`\`\`
+```
 
 ## Project Structure
 
-\`\`\`
+```
 src/
 ├── app/
 │   ├── components/          # Reusable components
@@ -135,12 +135,12 @@ src/
 │   └── services/         # Application services
 ├── assets/              # Static assets
 └── environments/       # Environment configurations
-\`\`\`
+```
 
 ## Core Components
 
 ### Navbar Component
-Location: \`src/app/components/navbar\`
+Location: `src/app/components/navbar`
 
 Features:
 - User profile display
@@ -148,19 +148,28 @@ Features:
 - Responsive design
 - Logout functionality
 
-![Navbar Screenshot](docs/images/navbar.png)
+![Navbar Screenshot](docs/images/navbar.jpeg)
+
+Desktop Dark Mode:
+![Navbar Dark Mode](docs/images/navbar-dark.jpeg)
+
+Mobile View:
+![Navbar Mobile](docs/images/navbar-mobile.png)
+
+Mobile Dark Mode:
+![Navbar Mobile Dark](docs/images/navbar-mobile-dark.png)
 
 Customization:
-\`\`\`typescript
+```typescript
 // navbar.component.ts
 menuItems = [
   { label: 'Home', link: '/home', icon: 'pi pi-home' },
   // Add your menu items here
 ];
-\`\`\`
+```
 
 ### Sidebar Component
-Location: \`src/app/components/sidebar\`
+Location: `src/app/components/sidebar`
 
 Features:
 - Collapsible navigation
@@ -171,24 +180,24 @@ Features:
 ![Sidebar Screenshot](docs/images/sidebar.png)
 
 ### Breadcrumb Component
-Location: \`src/app/components/breadcrumb\`
+Location: `src/app/components/breadcrumb`
 
 Usage in routes:
-\`\`\`typescript
+```typescript
 // app.routes.ts
 {
   path: 'dashboard',
   component: DashboardComponent,
   data: { breadcrumb: 'Dashboard' }
 }
-\`\`\`
+```
 
 ## Security Features
 
 ### Role-Based Access Control
 
 1. Using the HasRole Directive:
-\`\`\`html
+```html
 <!-- Only show to admins -->
 <button *appHasRole="['ADMIN']">Admin Action</button>
 
@@ -196,10 +205,10 @@ Usage in routes:
 <div *appHasRole="['MANAGER', 'ADMIN']">
   Restricted Content
 </div>
-\`\`\`
+```
 
 2. Route Protection:
-\`\`\`typescript
+```typescript
 // app.routes.ts
 {
   path: 'admin',
@@ -207,7 +216,7 @@ Usage in routes:
   canActivate: [AuthGuard],
   data: { roles: ['ADMIN'] }
 }
-\`\`\`
+```
 
 ### Token Management
 
@@ -227,18 +236,18 @@ The system automatically:
    - Affects all components
 
 2. Custom Theme Colors:
-   - Edit in \`styles.css\`:
-\`\`\`css
+   - Edit in `styles.css`:
+```css
 :root {
   --primary-color: #2196F3;
   --secondary-color: #607D8B;
   // Add your custom colors
 }
-\`\`\`
+```
 
 ### PrimeNG Customization
 
-Location: \`src/styles/primeng/\`
+Location: `src/styles/primeng/`
 - Override component styles
 - Customize component themes
 - Add custom animations
@@ -248,12 +257,12 @@ Location: \`src/styles/primeng/\`
 ### Adding New Pages
 
 1. Create component:
-\`\`\`bash
+```bash
 ng generate component pages/your-page
-\`\`\`
+```
 
 2. Add route:
-\`\`\`typescript
+```typescript
 // app.routes.ts
 {
   path: 'your-page',
@@ -264,7 +273,7 @@ ng generate component pages/your-page
     breadcrumb: 'Your Page'
   }
 }
-\`\`\`
+```
 
 ### Error Handling
 
@@ -299,14 +308,11 @@ The boilerplate includes global error handling:
 ### Dashboard
 ![Dashboard](docs/images/dashboard.png)
 
-### Profile Page
-![Profile Page](docs/images/profile.png)
+### Dashboard Dark Mode
+![Dashboard Dark](docs/images/dashboard-dark.png)
 
 ### Mobile View
-![Mobile View](docs/images/mobile.png)
-
-### Dark Mode
-![Dark Mode](docs/images/dark-mode.png)
+![Dashboard Mobile](docs/images/dashboard-mobile.png)
 
 ## Contributing
 
