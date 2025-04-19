@@ -56,7 +56,7 @@ A production-ready Angular 17+ boilerplate for Enterprise Resource Planning (ERP
 
 1. Clone the repository:
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/LEOQuester/AngularBoilerPlate
 cd AngularBoilerPlate
 ```
 
