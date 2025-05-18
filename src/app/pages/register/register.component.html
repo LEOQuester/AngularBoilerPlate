@@ -1,0 +1,218 @@
+<div class="surface-ground flex items-center justify-center min-h-screen min-w-full overflow-hidden px-4 py-8">
+  <div class="flex flex-col items-center justify-center w-full max-w-2xl mx-auto">
+    <p-card styleClass="shadow-2 rounded-2xl w-full">
+      <div class="text-center mb-5">
+        <div class="text-gray-900 text-3xl font-semibold mb-3 dark:text-slate-300">Create an Account</div>
+        <span class="text-gray-600 font-medium dark:text-slate-400">Join us today!</span>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="w-full">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Username -->
+          <div class="field">
+            <p-floatlabel variant="on">
+              <input id="username" type="text" pInputText formControlName="username" class="w-full">
+              <label for="username">Username*</label>
+            </p-floatlabel>
+            <small class="p-error" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
+              Username is required (min 4 characters)
+            </small>
+          </div>
+
+          <!-- Email -->
+          <div class="field">
+            <p-floatlabel variant="on">
+              <input id="email" type="email" pInputText formControlName="email" class="w-full">
+              <label for="email">Email*</label>
+            </p-floatlabel>
+            <small class="p-error" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+              Please enter a valid email address
+            </small>
+          </div>
+
+          <!-- First Name -->
+          <div class="field">
+            <p-floatlabel variant="on">
+              <input id="first_name" type="text" pInputText formControlName="first_name" class="w-full">
+              <label for="first_name">First Name*</label>
+            </p-floatlabel>
+            <small class="p-error" *ngIf="registerForm.get('first_name')?.invalid && registerForm.get('first_name')?.touched">
+              First name is required (min 2 characters)
+            </small>
+          </div>
+
+          <!-- Last Name -->
+          <div class="field">
+            <p-floatlabel variant="on">
+              <input id="last_name" type="text" pInputText formControlName="last_name" class="w-full">
+              <label for="last_name">Last Name*</label>
+            </p-floatlabel>
+            <small class="p-error" *ngIf="registerForm.get('last_name')?.invalid && registerForm.get('last_name')?.touched">
+              Last name is required (min 2 characters)
+            </small>
+          </div>
+
+          <!-- Phone -->
+          <div class="field">
+            <ngx-intl-tel-input
+              [cssClass]="'custom border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none'"
+              [preferredCountries]="['lk']"
+              [enableAutoCountrySelect]="true"
+              [enablePlaceholder]="true"
+              [searchCountryFlag]="true"
+              [selectFirstCountry]="false"
+              [maxLength]="15"
+              [phoneValidation]="true"
+              [separateDialCode]="true"
+              name="phone_number"
+              formControlName="phone_number"
+              (input)="onPhoneInput($event)"
+            ></ngx-intl-tel-input>
+            <small class="p-error" *ngIf="registerForm.get('phone_number')?.invalid && registerForm.get('phone_number')?.touched">
+              Please enter a valid phone number
+            </small>
+          </div>
+
+          <!-- Gender -->
+          <div class="field">
+            <p-dropdown 
+              [options]="genderOptions" 
+              formControlName="gender" 
+              [showClear]="true" 
+              styleClass="w-full"
+              [autoDisplayFirst]="false"
+              placeholder="Select Gender*"
+              inputId="gender">
+            </p-dropdown>
+            <small class="p-error" *ngIf="registerForm.get('gender')?.invalid && registerForm.get('gender')?.touched">
+              Please select your gender
+            </small>
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div class="field mt-4">
+          <p-floatlabel variant="on">
+            <textarea 
+              id="address" 
+              pInputTextarea 
+              formControlName="address" 
+              [rows]="3" 
+              class="w-full">
+            </textarea>
+            <label for="address">Address*</label>
+          </p-floatlabel>
+          <small class="p-error" *ngIf="registerForm.get('address')?.invalid && registerForm.get('address')?.touched">
+            Address is required (min 10 characters)
+          </small>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <!-- Date of Birth -->
+          <div class="field">
+            <p-floatlabel variant="on">
+              <p-calendar formControlName="dob" [maxDate]="maxDate" [showIcon]="true" styleClass="w-full"></p-calendar>
+              <label for="dob">Date of Birth*</label>
+            </p-floatlabel>
+            <small class="p-error" *ngIf="registerForm.get('dob')?.invalid && registerForm.get('dob')?.touched">
+              Please enter your date of birth
+            </small>
+          </div>
+
+          <!-- NIC -->
+          <div class="field">
+            <p-floatlabel variant="on">
+              <input id="nic" type="text" pInputText formControlName="nic" class="w-full">
+              <label for="nic">NIC (Optional)</label>
+            </p-floatlabel>
+          </div>
+
+          <!-- Password -->
+          <div class="field">
+            <p-floatlabel variant="on">
+              <p-password formControlName="password" [feedback]="true" [toggleMask]="true" styleClass="w-full"></p-password>
+              <label for="password">Password*</label>
+            </p-floatlabel>
+            <small class="p-error" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+              Password is required (min 8 characters)
+            </small>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="field">
+            <p-floatlabel variant="on">
+              <p-password formControlName="password2" [feedback]="false" [toggleMask]="true" styleClass="w-full"></p-password>
+              <label for="password2">Confirm Password*</label>
+            </p-floatlabel>
+            <small class="p-error" *ngIf="registerForm.get('password2')?.invalid && registerForm.get('password2')?.touched">
+              Please confirm your password
+            </small>
+            <small class="p-error" *ngIf="registerForm.hasError('passwordMismatch') && registerForm.get('password2')?.touched">
+              Passwords do not match
+            </small>
+          </div>
+        </div>
+
+      
+
+        <!-- Profile Picture Upload -->
+        <div class="field col-span-full mt-4">
+          <label class="block text-sm font-medium mb-2">Profile Picture (Optional)</label>
+          <p-fileUpload
+            #fileUpload
+            mode="advanced"
+            [maxFileSize]="1000000"
+            accept="image/*"
+            [fileLimit]="1"
+            [showUploadButton]="false"
+            [showCancelButton]="false"
+            chooseLabel="Choose Image"
+            [customUpload]="true"
+            (onSelect)="onProfilePicSelect($event)"
+            (onRemove)="onProfilePicRemove()"
+            [style]="{'width':'100%'}"
+            styleClass="profile-upload"
+            [invalidFileSizeMessageDetail]="'Maximum file size allowed is 1MB'"
+            [invalidFileTypeMessageDetail]="'Only image files are allowed (jpg, jpeg, png, webp)'"
+          >
+            <ng-template pTemplate="content">
+              <div class="upload-hint text-gray-600 text-sm text-center mt-2" *ngIf="!selectedProfilePic">
+                <i class="pi pi-image text-2xl mb-2"></i>
+                <div>Drag and drop your profile picture here</div>
+                <div class="text-xs mt-1">Supported formats: JPG, PNG, WEBP (max 1MB)</div>
+              </div>
+              <div class="preview-container" *ngIf="selectedProfilePic">
+                <img [src]="previewImageUrl" alt="Profile Preview" class="preview-image mx-auto mt-2 rounded-full w-24 h-24 object-cover"/>
+              </div>
+            </ng-template>
+          </p-fileUpload>
+        </div>
+
+        
+
+        <!-- Submit Button -->
+        <div class="flex flex-col gap-2 mt-4">
+          <p-button type="submit" 
+                    label="Register" 
+                    [disabled]="registerForm.invalid || isSubmitting" 
+                    [loading]="isSubmitting" 
+                    styleClass="w-full" 
+                    [raised]="true">
+          </p-button>
+
+          <p-divider align="center">
+            <span class="text-gray-600 font-normal">Already have an account?</span>
+          </p-divider>
+
+          <p-button label="Sign In" 
+                    styleClass="w-full p-button-outlined" 
+                    [raised]="true" 
+                    routerLink="/login">
+          </p-button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>
+<p-toast [breakpoints]="{ '500px': { width: '90%', right: '1%', left: '10%' } }"></p-toast>

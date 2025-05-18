@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
@@ -22,14 +22,13 @@ import { User } from '../../models/auth/auth.interface';
     TooltipModule
   ],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css']
+  styleUrls: ['./navbar.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavbarComponent implements OnInit {
-
   // Define the logo path here
   logoPath: string = "https://99designs-blog.imgix.net/blog/wp-content/uploads/2022/06/Starbucks_Corporation_Logo_2011.svg-e1657703028844.png?auto=format&q=60&fit=max&w=930";
   
-
   //customise this section to add more menu items
   // maximum 4 items are allowed in the navbar
   menuItems = [
@@ -42,37 +41,67 @@ export class NavbarComponent implements OnInit {
   isDarkMode: boolean = false;
   isDrawerOpen: boolean = false;
   currentUser: User | null = null;
+  avatarLoadError: boolean = false;
+  private _userProfile: string | undefined;
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  // Initialize theme state on component load
   ngOnInit(): void {
     const savedMode = localStorage.getItem('darkMode');
     if (savedMode) {
       this.isDarkMode = savedMode === 'true';
       this.applyTheme();
     }
+    
+    // Initial load
     this.loadUser();
+    
+    // Subscribe to auth state changes
+    this.authService.user$.subscribe(user => {
+      this.currentUser = user;
+      this.updateUserProfile();
+      this.avatarLoadError = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private updateUserProfile(): void {
+    if (!this.currentUser?.profile_pic || this.avatarLoadError) {
+      this._userProfile = undefined;
+    } else {
+      const url = new URL(this.currentUser.profile_pic);
+      url.protocol = 'https:';
+      this._userProfile = url.toString();
+    }
   }
 
   private loadUser(): void {
     const userString = localStorage.getItem(this.authService.getUserStorageKey());
+    console.log('NavbarComponent loadUser - raw localStorage value:', this.authService.getUserStorageKey(), userString);
     if (userString) {
       this.currentUser = JSON.parse(userString);
+      console.log('NavbarComponent loadUser - parsed user object:', this.currentUser);
+      console.log('NavbarComponent loadUser - profile_pic value:', this.currentUser?.profile_pic);
     }
   }
 
   get userInitial(): string {
-    if (!this.currentUser) return '';
+    if (!this.currentUser?.name) return '';
     return this.currentUser.name.charAt(0).toUpperCase();
   }
 
   get userProfile(): string | undefined {
-    if (!this.currentUser) return undefined;
-    return (this.currentUser as any)?.profile?.image || undefined;
+    return this._userProfile;
+  }
+
+  handleAvatarError(event: any): void {
+    this.avatarLoadError = true;
+    this._userProfile = undefined;
+    this.cdr.markForCheck();
   }
 
   // Check if user is not logged in

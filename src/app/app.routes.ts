@@ -5,6 +5,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { TestComponent } from './pages/test/test.component';
 import { AuthGuard } from './services/auth/auth.guard';
+import { RegisterComponent } from './pages/register/register.component';
 
 export const routes: Routes = [
     {
@@ -17,6 +18,11 @@ export const routes: Routes = [
         component: LoginComponent,
         canActivate: [AuthGuard],
         data: { authGuard: 'canActivateLogin' }
+    },
+    {
+        path: "register",
+        component: RegisterComponent,
+        data: { breadcrumb: 'Register' }
     },
     {
         path: "test",

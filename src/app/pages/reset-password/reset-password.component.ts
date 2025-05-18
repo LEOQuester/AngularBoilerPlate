@@ -26,8 +26,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
     RouterLink,
     FloatLabelModule
   ],
-  templateUrl: './reset-password.component.html',
-  providers: [MessageService]
+  templateUrl: './reset-password.component.html'
 })
 export class ResetPasswordComponent implements OnInit {
   resetPasswordForm!: FormGroup;

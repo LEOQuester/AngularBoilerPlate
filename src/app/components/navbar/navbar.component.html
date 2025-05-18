@@ -26,19 +26,20 @@
 
         <div class="flex items-center mt-0 lg:mt-1 gap-2">
             <!-- Profile Section with Avatar and Greeting -->
+            <!-- Desktop view avatar -->
             <div class="flex items-center gap-2" *ngIf="!isUserNotLoggedIn">
                 <div class="flex items-center">
                     <p-avatar 
                         [image]="userProfile"
-                        [label]="userInitial"
+                        [label]="userProfile ? undefined : userInitial"
                         styleClass="mr-2"
                         class="lg:size-large p-2 cursor-pointer"
                         [style]="{ 'background-color': '#fafbfc', color: '#2a1261' }"
                         shape="circle"
-                        [pTooltip]="'Edit Profile <i class=\'pi pi-user-edit\'></i>'"
-                        [escape]="false"
-                        tooltipPosition="bottom"
+                        [pTooltip]="'Edit Profile'"
+                        size="large"
                         (click)="navigateToProfile()"
+                        (onImageError)="handleAvatarError($event)"
                     />
                 </div>
                 <div class="hidden lg:flex flex-col justify-center">
@@ -97,15 +98,15 @@
           text-center m-1 justify-center rounded-md">
         <p-avatar 
             [image]="userProfile"
-            [label]="userInitial"
+            [label]="userProfile ? undefined : userInitial"
             styleClass="mr-2"
             class="cursor-pointer"
             [style]="{ 'background-color': '#fafbfc', color: '#2a1261' }"
             shape="circle"
-            [pTooltip]="'Edit Profile <i class=\'pi pi-user-edit\'></i>'"
-            [escape]="false"
-            tooltipPosition="bottom"
+            size="large"
+            [pTooltip]="'Edit Profile'"
             (click)="navigateToProfile()"
+            (onImageError)="handleAvatarError($event)"
         />
         <div class="flex flex-col items-start">
             <span class="text-sm">Hello 👋</span>

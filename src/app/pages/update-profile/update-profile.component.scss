@@ -1,0 +1,86 @@
+.profile-container {
+  .profile-picture {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+    transition: transform 0.3s ease;
+    position: relative;
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+
+    &:hover {
+      transform: scale(1.05);
+      border-color: var(--primary-color);
+    }
+  }
+
+  .field {
+    margin-bottom: 1.5rem;
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    small.p-error {
+      margin-top: 0.25rem;
+      display: block;
+    }
+  }
+}
+
+.spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+}
+
+::ng-deep {
+  .custom-spinner {
+    .p-progress-spinner {
+      width: 50px;
+      height: 50px;
+    }
+  }
+
+  .p-calendar, .p-dropdown, .p-inputtext {
+    width: 100%;
+  }
+
+  .p-fileupload-choose {
+    width: auto;
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: var(--primary-color);
+      color: var(--primary-color-text);
+    }
+  }
+
+  .p-fileupload {
+    .p-fileupload-buttonbar {
+      padding: 0;
+      border: none;
+      background: transparent;
+    }
+  }
+
+  // Handle dark mode
+  .dark & {
+    .spinner-overlay {
+      background: rgba(0, 0, 0, 0.7);
+    }
+  }
+}

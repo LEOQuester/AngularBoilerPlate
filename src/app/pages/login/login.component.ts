@@ -1,5 +1,5 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { MessageModule } from 'primeng/message';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -13,51 +13,51 @@ import { FloatLabel } from 'primeng/floatlabel';
 import { TabsModule } from 'primeng/tabs';
 import { DropdownModule } from 'primeng/dropdown';
 import { parsePhoneNumberFromString, isValidPhoneNumber } from 'libphonenumber-js';
-import {NgxIntlTelInputModule, SearchCountryField, CountryISO, PhoneNumberFormat} from 'ngx-intl-tel-input';
+import { NgxIntlTelInputModule, SearchCountryField, CountryISO, PhoneNumberFormat } from 'ngx-intl-tel-input';
 import { AuthService } from '../../services/auth/auth.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Ripple } from 'primeng/ripple';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { DialogModule } from 'primeng/dialog'
 import { FooterComponent } from '../../components/footer/footer.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule,DropdownModule,
-    MessageModule,InputTextModule,
-    ButtonModule,NgxIntlTelInputModule,
-    CardModule,FloatLabel,PasswordModule,
-    DividerModule,CheckboxModule,TabsModule,Ripple,
-    FormsModule,ReactiveFormsModule, ToastModule, DialogModule,
-    FooterComponent
+    CommonModule, DropdownModule,
+    MessageModule, InputTextModule,
+    ButtonModule, NgxIntlTelInputModule,
+    CardModule, FloatLabel, PasswordModule,
+    DividerModule, CheckboxModule, TabsModule, Ripple,
+    FormsModule, ReactiveFormsModule, ToastModule, DialogModule,
+    FooterComponent, RouterModule
   ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
-  providers: [MessageService]
+  styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit, AfterViewInit {
-  
+export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
+
   loginForm!: FormGroup;
   rememberMe: boolean = false;
   loginType: 'email' | 'phone' | 'username' = 'email';
   selectedCountryCode: string = '+94';
   loginTypeIndex: number = 0;
-  phone_initialized: boolean = false; 
+  phone_initialized: boolean = false;
   SearchCountryField = SearchCountryField;
-	CountryISO = CountryISO;
-  isLoggingIn : boolean = false;
-  controlValue : any = "";
-  
+  CountryISO = CountryISO;
+  isLoggingIn: boolean = false;
+  controlValue: any = "";
+
   PhoneNumberFormat = PhoneNumberFormat;
   preferredCountries: CountryISO[] = [CountryISO.SriLanka];
   selectedCountry: CountryISO = CountryISO.SriLanka;
 
   phone_errors: string[] = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number"];
-  phone_error : string = "";
-  iti : any;
+  phone_error: string = "";
+  iti: any;
 
   countryCodes = [];
 
@@ -65,12 +65,14 @@ export class LoginComponent implements OnInit, AfterViewInit {
   forgotPasswordForm!: FormGroup;
   isSubmittingForgotPassword: boolean = false;
 
+  private destroy$ = new Subject<void>();
+
   constructor(
-    private fb: FormBuilder, 
-    private authService: AuthService, 
+    private fb: FormBuilder,
+    private authService: AuthService,
     private messageService: MessageService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -99,20 +101,20 @@ export class LoginComponent implements OnInit, AfterViewInit {
   selectLoginType(index: number): void {
     console.log('Selected login type index:', index);
     this.loginTypeIndex = index;
-  
+
     const email = this.loginForm.get('email');
     const phone = this.loginForm.get('phone');
     const username = this.loginForm.get('username');
-  
+
     // Reset and disable all
     email?.reset();
     phone?.reset();
     username?.reset();
-  
+
     email?.clearValidators();
     phone?.clearValidators();
     username?.clearValidators();
-  
+
     email?.disable();
     phone?.disable();
     username?.disable();
@@ -132,7 +134,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     }
 
     console.log('Selected login type:', this.loginType);
-  
+
     email?.updateValueAndValidity();
     phone?.updateValueAndValidity();
     username?.updateValueAndValidity();
@@ -142,39 +144,38 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.isLoggingIn = true;
     const control = this.loginForm.get(this.loginType);
     const password = this.loginForm.get('password');
-  
+
     if (!control?.valid || !password?.valid) return;
-    
+
     this.controlValue = control.value;
 
-    if (this.loginType == "phone"){
-      this.controlValue = control.value.e164Number; 
+    if (this.loginType == "phone") {
+      this.controlValue = control.value.e164Number;
     }
 
     const payload = {
       username_or_email_or_phone: this.controlValue,
       password: password.value
     };
-  
+
     this.authService.login(payload).pipe(
-      finalize(() => this.isLoggingIn = false)
+      finalize(() => this.isLoggingIn = false),
+      takeUntil(this.destroy$)
     ).subscribe({
-      next: (response) => {
-        console.log('Login successful, checking cookies:', document.cookie);
-        this.messageService.add({ 
-          severity: 'success', 
-          summary: 'Success', 
-          detail: 'Login successful' 
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Login successful'
         });
-        setTimeout(() => {
-          this.router.navigate(['/dashboard']);
-        }, 5000); // 5000 milliseconds = 5 seconds
+
+        // The navigation is now handled by AuthService based on verification status
       },
       error: (error) => {
         console.error('Login failed:', error);
-        this.messageService.add({ 
-          severity: 'error', 
-          summary: 'Error', 
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
           detail: error.error?.message || 'Login Failed. Please try again!'
         });
       },
@@ -186,22 +187,22 @@ export class LoginComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       const control = this.loginForm.get('phone');
       const phoneControlValue = control?.value;
-  
+
       if (!phoneControlValue || !phoneControlValue.number) return;
-  
+
       const inputVal = phoneControlValue.number;
       const countryCode = phoneControlValue.countryCode?.toUpperCase(); // example: 'LK', 'US'
-  
+
       const phoneNumber = parsePhoneNumberFromString(inputVal, countryCode);
-  
+
       if (phoneNumber && isValidPhoneNumber(inputVal, countryCode)) {
         const formattedNumber = phoneNumber.formatNational();
-  
+
         control?.setValue({
           ...phoneControlValue,
           number: formattedNumber
         });
-  
+
         control?.setErrors(null); // ✅ Clear previous errors if valid
         console.log('Formatted:', formattedNumber, 'Valid?', true);
       } else {
@@ -232,6 +233,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: error.error.message });
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 }

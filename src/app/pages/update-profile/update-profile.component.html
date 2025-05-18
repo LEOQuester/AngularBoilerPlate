@@ -1,0 +1,252 @@
+<div class="surface-ground min-h-screen">
+  <div class="block sm:flex justify-content-center">
+    <p-card styleClass="w-full">
+      <ng-template pTemplate="content">
+        <!-- Header -->
+        <div class="text-center mb-5">
+          <div class="text-900 text-3xl font-medium mb-3">Account Verification</div>
+          <span class="text-600">Verify your email and phone number to access all features</span>
+        </div>
+
+        <!-- Verification Sections -->
+        <div class="grid">
+          <!-- Email Verification Section -->
+          <div class="col-12 md:col-6">
+            <div class="mb-6 p-4 border-round surface-card">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xl m-0">Email Verification</h3>
+                <div class="flex items-center px-3 py-1 rounded">
+                  <i class="pi"
+                    [class.pi-check-circle]="currentUser?.is_email_verified" 
+                    [class.pi-times-circle]="!currentUser?.is_email_verified"
+                    [class.text-green-500]="currentUser?.is_email_verified"
+                    [class.text-red-500]="!currentUser?.is_email_verified"
+                    style="font-size: 1.2rem;"></i>
+                  <span class="ml-2"
+                        [class.text-green-500]="currentUser?.is_email_verified"
+                        [class.text-red-500]="!currentUser?.is_email_verified">
+                    {{ currentUser?.is_email_verified ? 'Verified' : 'Not Verified' }}
+                  </span>
+                </div>
+              </div>
+
+              <div *ngIf="!currentUser?.is_email_verified">
+                <button pButton 
+                        [label]="isEmailButtonDisabled ? 'Code Sent (' + formatTime(emailTimeRemaining) + ')' : 'Send Code'"
+                        (click)="sendEmailCode()" 
+                        [disabled]="isEmailButtonDisabled"
+                        [loading]="isSendingEmailCode"
+                        class="w-full mb-3"></button>
+
+                <div *ngIf="showEmailOtpInput" class="mt-4">
+                  <p-inputotp [length]="6" 
+                             [(ngModel)]="emailOtp" 
+                             styleClass="flex justify-content-center gap-2"></p-inputotp>
+                  <button pButton 
+                          label="Verify Email" 
+                          (click)="verifyEmailOtp()"
+                          [loading]="isVerifyingEmail"
+                          class="w-full mt-3"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phone Verification Section -->
+          <div class="col-12 md:col-6">
+            <div class="p-4 border-round surface-card">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xl m-0">Phone Verification</h3>
+                <div class="flex items-center py-1 rounded">
+                  <i class="pi"
+                    [class.pi-check-circle]="currentUser?.is_phone_verified" 
+                    [class.pi-times-circle]="!currentUser?.is_phone_verified"
+                    [class.text-green-500]="currentUser?.is_phone_verified"
+                    [class.text-red-500]="!currentUser?.is_phone_verified"
+                    style="font-size: 1.2rem;"></i>
+                  <span class="ml-2"
+                        [class.text-green-500]="currentUser?.is_phone_verified"
+                        [class.text-red-500]="!currentUser?.is_phone_verified">
+                    {{ currentUser?.is_phone_verified ? 'Verified' : 'Not Verified' }}
+                  </span>
+                </div>
+              </div>
+
+              <div *ngIf="!currentUser?.is_phone_verified">
+                <button pButton 
+                        [label]="isPhoneButtonDisabled ? 'Code Sent (' + formatTime(phoneTimeRemaining) + ')' : 'Send Code'"
+                        (click)="sendPhoneCode()" 
+                        [disabled]="isPhoneButtonDisabled"
+                        [loading]="isSendingPhoneCode"
+                        class="w-full mb-3"></button>
+
+                <div *ngIf="showPhoneOtpInput" class="mt-4">
+                  <p-inputotp [length]="6" 
+                             [(ngModel)]="phoneOtp" 
+                             styleClass="flex justify-content-center gap-2"></p-inputotp>
+                  <button pButton 
+                          label="Verify Phone" 
+                          (click)="verifyPhoneOtp()"
+                          [loading]="isVerifyingPhone"
+                          class="w-full mt-3"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </ng-template>
+    </p-card>
+    <p-card class="ml-5 w-full">
+      <div class="mt-6">
+          <div class="surface-card p-4 shadow-2 border-round">
+            <div class="text-900 font-medium text-xl mb-3">Profile Management</div>
+            <p-progressSpinner *ngIf="loading" 
+                             [style]="{width: '50px', height: '50px'}" 
+                             styleClass="custom-spinner" 
+                             fill="#dee2e6" 
+                             strokeWidth="8"></p-progressSpinner>
+            
+            <div *ngIf="!loading" class="profile-container">              <!-- Profile Picture -->
+              <div class="align-items-center mb-3">                
+                <div class="p-image flex items-center justify-content-center flex-col">
+                  <img [src]="getProfilePicUrl()" 
+                      class="profile-picture mb-2" 
+                      alt="Profile Picture">
+                  
+                  <div *ngIf="uploadLoading" class="spinner-overlay">
+                    <p-progressSpinner [style]="{width: '50px', height: '50px'}" strokeWidth="8"></p-progressSpinner>
+                  </div>
+                </div>
+
+                <p-fileUpload mode="basic" 
+                             chooseLabel="Change Picture" 
+                             [auto]="false"
+                             accept="image/*"
+                             [maxFileSize]="5000000"
+                             (onSelect)="onProfilePictureChange($event)"
+                             styleClass="p-button-outlined p-button-sm"></p-fileUpload>
+
+                <small class="text-warning" *ngIf="selectedProfilePicture">
+                  Click 'Save Changes' to update your profile picture
+                </small>
+              </div>
+
+              <!-- Profile Form -->
+              <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="p-fluid">
+                <div class="block sm:flex">
+                  
+                  <!-- Left Column -->
+                  <div class="w-full sm:w-[50%] mr-1">
+                    <div class="field">
+                      <label for="username">Username</label>
+                      <input id="username" type="text" pInputText formControlName="username" class="p-inputtext-sm" />
+                      <small class="p-error" *ngIf="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
+                        Username is required
+                      </small>
+                    </div>
+
+                    <div class="field">
+                      <label for="first_name">First Name *</label>
+                      <input id="first_name" type="text" pInputText formControlName="first_name" class="p-inputtext-sm" />
+                      <small class="p-error" *ngIf="profileForm.get('first_name')?.invalid && profileForm.get('first_name')?.touched">
+                        First name is required
+                      </small>
+                    </div>
+
+                    <div class="field">
+                      <label for="last_name">Last Name *</label>
+                      <input id="last_name" type="text" pInputText formControlName="last_name" class="p-inputtext-sm" />
+                      <small class="p-error" *ngIf="profileForm.get('last_name')?.invalid && profileForm.get('last_name')?.touched">
+                        Last name is required
+                      </small>
+                    </div>
+
+                    <div class="field">
+                      <label for="address">Address</label>
+                      <textarea id="address" class="w-full"
+                                pInputTextarea
+                                formControlName="address"></textarea>
+                    </div>
+                  </div>
+
+                  <!-- Right Column -->
+                  <div class="w-full sm:w-[50%]">
+                    <div class="field">
+                      <label for="email">Email</label>
+                      <input id="email" type="email" pInputText formControlName="email" class="p-inputtext-sm" />
+                      <small class="p-error" *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+                        Please enter a valid email
+                      </small>
+                    </div>
+
+                    
+
+                    <div class="field">
+                      <label for="nic">NIC (Optional)</label>
+                      <input id="nic"
+                            type="text"
+                            pInputText
+                            formControlName="nic"
+                            placeholder="National ID Card Number"
+                            class="p-inputtext-sm" />
+                    </div>
+
+                    <div class="field">
+                      <label for="phone_number">Phone Number</label>
+                      <ngx-intl-tel-input
+                        id="phone_number"
+                        [cssClass]="'custom border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none'"
+                        [enableAutoCountrySelect]="true"
+                        [enablePlaceholder]="true"
+                        [searchCountryFlag]="true"
+                        [selectFirstCountry]="false"
+                        [selectedCountryISO]="CountryISO.SriLanka"
+                        [preferredCountries]="preferredCountries"
+                        [maxLength]="15"
+                        [phoneValidation]="true"
+                        [separateDialCode]="true"
+                        name="phone_number"
+                        formControlName="phone_number"
+                        (input)="onPhoneInput($event)">
+                      </ngx-intl-tel-input>
+                      <small class="p-error" *ngIf="profileForm.get('phone_number')?.invalid && profileForm.get('phone_number')?.touched">
+                        Please enter a valid phone number
+                      </small>
+                    </div>
+
+                    <div class="field">
+                      <label for="dob">Date of Birth</label>
+                      <p-calendar id="dob"
+                                  formControlName="dob"
+                                  [showIcon]="true"
+                                  dateFormat="yy-mm-dd"
+                                  [maxDate]="maxDate"
+                                  
+                                  styleClass="p-inputtext-sm w-full m-0"></p-calendar>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex justify-content-between align-items-center mt-4 float-right">
+                  <p-button type="submit" 
+                            label="Save Changes" 
+                            [loading]="loading"
+                            styleClass="p-button-primary m-1"></p-button>
+
+                  <p-button type="button" 
+                            label="Delete Account" 
+                            (click)="deleteAccount()"
+                            [loading]="loading"
+                            styleClass="p-button-danger p-button-outlined m-1"></p-button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+    </p-card>
+  </div>
+</div>
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

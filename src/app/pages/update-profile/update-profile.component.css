@@ -1,0 +1,8 @@
+.surface-card {
+    background-color: var(--surface-card);
+    border: 1px solid var(--surface-border);
+}
+
+:host ::ng-deep .p-inputtext {
+    border-radius: 6px;
+}
