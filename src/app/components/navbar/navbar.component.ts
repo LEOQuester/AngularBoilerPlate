@@ -27,7 +27,7 @@ import { User } from '../../models/auth/auth.interface';
 })
 export class NavbarComponent implements OnInit {
   // Define the logo path here
-  logoPath: string = "https://99designs-blog.imgix.net/blog/wp-content/uploads/2022/06/Starbucks_Corporation_Logo_2011.svg-e1657703028844.png?auto=format&q=60&fit=max&w=930";
+  logoPath: string = "/joshepvaslogo.png";
   
   //customise this section to add more menu items
   // maximum 4 items are allowed in the navbar
@@ -71,7 +71,7 @@ export class NavbarComponent implements OnInit {
 
   private updateUserProfile(): void {
     if (!this.currentUser?.profile_pic || this.avatarLoadError) {
-      this._userProfile = undefined;
+      this._userProfile = "/profile.jpg"; // Fallback profile picture
     } else {
       const url = new URL(this.currentUser.profile_pic);
       url.protocol = 'https:';

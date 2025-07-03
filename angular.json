@@ -24,8 +24,10 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets"
             ],
+            
             "styles": [
               "src/styles.css",
               "./node_modules/intl-tel-input/build/css/intlTelInput.css"
@@ -92,7 +94,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets"
             ],
             "styles": [
               "src/styles.css",

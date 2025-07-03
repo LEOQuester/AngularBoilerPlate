@@ -414,7 +414,7 @@ export class AuthService extends BaseService {
    * Verify phone with OTP
    */
   verifyPhoneOtp(otp: string): Observable<void> {
-    return this.http.post<void>(API_ENDPOINTS.AUTH.VERIFY_OTP, { opt: otp, verification_type: 'PHONE' });
+    return this.http.post<void>(API_ENDPOINTS.AUTH.VERIFY_OTP, { otp: otp, verification_type: 'PHONE' });
   }
 
 }

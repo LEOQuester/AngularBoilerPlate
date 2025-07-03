@@ -672,8 +672,10 @@ export class UpdateProfileComponent implements OnInit, AfterContentInit {
     }, 200);
   }
   getProfilePicUrl(): string {
-    return this.localProfilePicPreview || this.profile?.profile_pic || 'assets/images/default-avatar.png';
+    return this.localProfilePicPreview || this.profile?.profile_pic || '/profile.jpg';
   }
+
+
 
   private updateProfilePicture(response: { profile_picture: string }) {
     const pic = response.profile_picture;

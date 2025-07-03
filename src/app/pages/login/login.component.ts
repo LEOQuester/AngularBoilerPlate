@@ -169,7 +169,7 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
           detail: 'Login successful'
         });
 
-        // The navigation is now handled by AuthService based on verification status
+        this.router.navigate(['/dashboard']);
       },
       error: (error) => {
         console.error('Login failed:', error);
